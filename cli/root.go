@@ -26,7 +26,7 @@ func Execute() {
 			e := echo.New()
 			e.Static("/", "./static")
 			e.POST("/api/auth/login", authHandler.Login)
-			e.POST("/api/auth/info", authHandler.Info)
+			e.GET("/api/auth/info", authHandler.Info)
 			e.POST("/api/process/start", procHandler.Start, authHandler.Authorized)
 			e.POST("/api/process/stop", procHandler.Stop, authHandler.Authorized)
 			e.POST("/api/process/restart", procHandler.Stop, authHandler.Authorized)

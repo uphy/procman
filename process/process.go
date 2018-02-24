@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 	"sync"
+	"syscall"
 )
 
 type (
@@ -38,6 +39,7 @@ func (p *Process) State() State {
 
 func (p *Process) createProcess() {
 	p.cmd = exec.Command(p.command[0], p.command[1:]...)
+	p.cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 }
 
 func (p *Process) Start() error {
@@ -87,7 +89,11 @@ func (p *Process) Stop() error {
 	if p.state != StateStarted {
 		return nil
 	}
-	return p.cmd.Process.Kill()
+	pgid, err := syscall.Getpgid(p.cmd.Process.Pid)
+	if err != nil {
+		return err
+	}
+	return syscall.Kill(-pgid, syscall.SIGTERM)
 }
 
 func (p *Process) Restart() error {
