@@ -1,0 +1,14 @@
+version: "3"
+
+services:
+  nginx:
+    build: .
+    environment:
+      PROCMAN_USER: admin
+      PROCMAN_PASSWORD: password
+      PROCMAN_SECRET: s3cr3t
+    ports:
+      # procman
+      - "81:81"
+      # nginx
+      - "80:80"

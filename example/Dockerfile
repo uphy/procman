@@ -1,15 +1,13 @@
-# procman
+FROM nginx:latest
 
-Process manager for docker container.
-Support to start/stop the process via API.
+# Install curl to download procman binary
+RUN apt-get update && \
+    apt-get install -y curl && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
-# Example
-
-Manage nginx process by procman.
-
-```Dockerfile
+# Install procman
 ARG PROCMAN_VERSION=0.0.1
 RUN curl -sL https://github.com/uphy/procman/releases/download/${PROCMAN_VERSION}/procman_linux_amd64.tar.gz | tar zx --strip 1 -C /usr/local/bin
 
 CMD procman -p 81 -- nginx -g "daemon off;"
-```
