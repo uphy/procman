@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/base64"
-	"log"
 	"strings"
 
 	"net/http"
@@ -48,7 +47,7 @@ func (a *Auth) Login(c echo.Context) error {
 	})
 	tokenstring, err := token.SignedString([]byte(a.jwtSecret))
 	if err != nil {
-		log.Fatalln(err)
+		return echo.NewHTTPError(http.StatusInternalServerError, err.Error())
 	}
 	return c.JSON(http.StatusOK, echo.Map{
 		"token": tokenstring,
@@ -59,17 +58,17 @@ func (a *Auth) checkUser(c echo.Context, user, password string) error {
 	if user == a.user && password == a.password {
 		return nil
 	}
-	return c.JSON(http.StatusForbidden, "user or password incorrect.")
+	return echo.NewHTTPError(http.StatusForbidden, "user or password incorrect.")
 }
 
 func (a *Auth) User(c echo.Context) (*User, error) {
 	authorization := c.Request().Header.Get("Authorization")
 	if authorization == "" {
-		return nil, c.JSON(http.StatusUnauthorized, "no logged in")
+		return nil, echo.NewHTTPError(http.StatusUnauthorized, "not logged in")
 	}
 	typeAndAuth := strings.Split(authorization, " ")
 	if len(typeAndAuth) != 2 {
-		return nil, c.JSON(http.StatusBadRequest, "Invalid Authorization header.")
+		return nil, echo.NewHTTPError(http.StatusBadRequest, "Invalid Authorization header.")
 	}
 	t := typeAndAuth[0]
 	au := typeAndAuth[1]
@@ -80,21 +79,21 @@ func (a *Auth) User(c echo.Context) (*User, error) {
 			return []byte(a.jwtSecret), nil
 		})
 		if err != nil {
-			return nil, c.JSON(http.StatusBadRequest, "Can not parse token")
+			return nil, echo.NewHTTPError(http.StatusBadRequest, "Can not parse token")
 		}
 		if !token.Valid {
-			return nil, c.JSON(http.StatusBadRequest, "Invalid token")
+			return nil, echo.NewHTTPError(http.StatusBadRequest, "Invalid token")
 		}
 		return &user, nil
 	case "Basic":
 		userAndPassword, err := base64.URLEncoding.DecodeString(au)
 		if err != nil {
-			return nil, c.JSON(http.StatusBadRequest, "Invalid Basic Authorization.")
+			return nil, echo.NewHTTPError(http.StatusBadRequest, "Invalid Basic Authorization.")
 		}
 		userAndPasswordString := string(userAndPassword)
 		userAndPasswordArray := strings.Split(userAndPasswordString, ":")
 		if len(userAndPasswordArray) != 2 {
-			return nil, c.JSON(http.StatusBadRequest, "Invalid Basic Authorization.")
+			return nil, echo.NewHTTPError(http.StatusBadRequest, "Invalid Basic Authorization.")
 		}
 		if err := a.checkUser(c, userAndPasswordArray[0], userAndPasswordArray[1]); err != nil {
 			return nil, err
@@ -103,7 +102,7 @@ func (a *Auth) User(c echo.Context) (*User, error) {
 			Name: userAndPasswordArray[0],
 		}, nil
 	}
-	return nil, c.JSON(http.StatusBadRequest, "Unsupported Authorization header.")
+	return nil, echo.NewHTTPError(http.StatusBadRequest, "Unsupported Authorization header.")
 }
 
 func (a *Auth) Info(c echo.Context) error {

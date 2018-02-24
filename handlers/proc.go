@@ -23,7 +23,7 @@ func (p *Proc) result(c echo.Context, err error) error {
 			"result": "success",
 		})
 	}
-	return c.JSON(http.StatusOK, echo.Map{
+	return echo.NewHTTPError(http.StatusOK, echo.Map{
 		"result":  "failure",
 		"message": err.Error(),
 	})
