@@ -38,6 +38,12 @@
   version = "v0.0.3"
 
 [[projects]]
+  name = "github.com/rakyll/statik"
+  packages = ["fs"]
+  revision = "fd36b3595eb2ec8da4b8153b107f7ea08504899d"
+  version = "v0.1.1"
+
+[[projects]]
   name = "github.com/spf13/cobra"
   packages = ["."]
   revision = "7b2c5ac9fc04fc5efafb60700713d4fa609b777b"
@@ -76,6 +82,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "03852a1c63d640435cb5a4f5526bfd7ad5395d66624158272b596b7564afeeb8"
+  inputs-digest = "6846e0ca4b70390b5ca0ad7c4ffb588d39b06569882c144bbc2c46344bf9bb5a"
   solver-name = "gps-cdcl"
   solver-version = 1
